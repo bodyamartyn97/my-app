@@ -23,7 +23,6 @@ function App() {
           setData(response.data)
         })
         .catch(err => console.warn(err))
-
       setCity('');
     }
 
