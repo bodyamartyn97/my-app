@@ -1,11 +1,82 @@
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 function App() {
-  return (
-    <>
-      <h1>Hello world</h1>
-      <h2>Привіт світ!</h2>
-    </>
 
-  );
+  const [data, setData] = useState({});
+  const [city, setCity] = useState('');
+
+  const key = '1f553a8e974694d7d8cbab5ce517c106';
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${key}&lang=ua`;
+
+  useEffect(() => {
+    axios.get(`https://api.openweathermap.org/data/2.5/weather?q=kyiv&units=metric&appid=${key}&lang=ua`)
+      .then(res => setData(res.data))
+      .catch(err => console.error(err));
+  }, [])
+
+
+  const onSearchWeather = (e) => {
+    if (e.key === 'Enter') {
+      axios.get(url)
+        .then(response => {
+          console.log(response);
+          setData(response.data)
+        })
+        .catch(err => console.warn(err))
+
+      setCity('');
+    }
+
+  }
+
+  return (
+    <div className="app">
+      <div className="inp-field">
+        <input type="text"
+          placeholder="Enter Location"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          onKeyDown={onSearchWeather}
+        />
+      </div>
+
+      <div className="container">
+
+        {data.name !== undefined && (
+          <>
+            <div className="header">
+              <div className="city">
+                <p>{data.name}</p>
+              </div>
+            </div>
+
+            <div className='temp'>
+              {data.main && <h1>{data.main.temp.toFixed()}°С</h1>}
+            </div>
+
+            <div className="desc">
+              {data.weather ? <p>{data.weather[0].description}</p> : null}
+            </div>
+
+            <div className="footer">
+              <div className="feels">
+                {data.main ? <p className='bold'>{data.main.feels_like.toFixed()}°С</p> : null}
+                <p>Відчувається як </p>
+              </div>
+              <div className="humidity">
+                {data.main && <p className='bold'> {data.main.humidity}%</p>}
+                <p>Вологість</p>
+              </div>
+              <div className="wind">
+                {data.wind && <p className='bold'>{data.wind.speed} М/С</p>}
+                <p>Вітер</p>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default App;
